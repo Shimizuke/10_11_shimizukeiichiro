@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>GSちゃんねる</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+  <style>
+    div {
+      padding: 10px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="#">GSちゃんねる</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+        </ul>
+      </div>
+    </nav>
+  </header>
+
+  <ul id="echo" class="list-group">
+    <!-- データ表示部分 -->
+  </ul>
+
+  <div>
+    <button type="button" id="showNew" class="btn btn-light">show new</button>
+  </div>
+
+  <form id="insert_form">
+    <div class="form-group">
+      <input type="text" class="form-control" id="name" name="name" placeholder="名前（省略可）">
+    </div>
+    <div class="form-group">
+      <textarea class="form-control" id="comment" name="comment" rows="3" placeholder="コメント"></textarea>
+    </div>
+    <div class="form-group">
+      <input type="file" class="form-control-file" id="upfile" name="upfile" accept="image/*" capture="camera">
+    </div>
+    <div class="form-group">
+      <button type="button" id="send" class="btn btn-primary">Submit</button>
+    </div>
+  </form>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+  <script>
+    // データをいい感じのタグに入れる関数
+    function createListTagFromData(data) {
+      // 出力用の配列を用意
+      const array = [];
+      // 順番にタグの形にして出力用の配列に追加する
+      for (let i = 0; i < data.length; i++) {
+        const str =
+          `<li class="list-group-item">
+            <p>${data[i].id} ${data[i].name} ${data[i].indate}</p>
+            <p>${data[i].comment}</p>
+            <img src="${data[i].image}" alt="" height="150px">
+          </li>`
+        array.push(str);
+      }
+      // 全部追加したらjoin()を使って，配列を連続した文字列にする
+      return array.join('');
+    };
+
+    // DBからデータを取得する関数
+    function getAllDataFromDb() {
+      const url = 'ajax_get.php';
+      $.ajax({
+        method: 'GET',
+        url: url,
+        dataType: 'json',
+      }).done(function (data) {
+        console.log(data);
+        // タグに入れる関数にデータを投げ，指定したidの部分に表示する
+        $('#echo').html(createListTagFromData(data));
+      }).fail(function (error) {
+        console.log(error);
+      }).always(function () {
+        console.log('completed!');
+      });
+    };
+
+    // PHPへデータを送信する関数
+    function insertDataToDb() {
+      const url = 'ajax_post.php';
+      // ファイル諸共にフォームの中身を取得する
+      const data = new FormData($('#insert_form').get(0));
+      // ajaxでデータを投げる
+      $.ajax({
+        method: 'POST',
+        url: url,
+        data: data,
+        dataType: 'json',
+        // ↓この2つはファイルを送信する場合に必須
+        processData: false,
+        contentType: false,
+      }).done(function (data) {
+        console.log(data);
+        // タグに入れる関数にデータを投げ，指定したidの部分に表示する
+        $('#echo').html(createListTagFromData(data));
+        // ボタンの無効化を解除する
+        $('button').attr('disabled', false);
+      }).fail(function () {
+        console.log(error);
+      }).always(function () {
+        console.log('completed!');
+      });
+    };
+
+    // 読み込み時にデータを取得する関数を実行
+    getAllDataFromDb();
+
+    // ボタン押したら最新データ取得
+    $('#showNew').on('click', function () {
+      getAllDataFromDb();
+    })
+
+    // 送信ボタンクリック時の処理
+    $('#send').on('click', function () {
+      // 2重送信をしないためにボタンを無効化する
+      $('button').attr('disabled', true);
+      // データを送信する関数を実行
+      insertDataToDb();
+      // 入力欄を空にする処理
+      $('#name').val('');
+      $('#comment').val('');
+      $('#upfile').val('');
+    })
+
+  </script>
+
+</body>
+
+</html>

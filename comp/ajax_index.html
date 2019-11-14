@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>GSちゃんねる</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+  <style>
+    div {
+      padding: 10px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="#">GSちゃんねる</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+        </ul>
+      </div>
+    </nav>
+  </header>
+
+  <ul id="echo" class="list-group">
+    <!-- データ表示部分 -->
+  </ul>
+
+  <div>
+    <button type="button" id="showNew" class="btn btn-light">show new</button>
+  </div>
+
+  <form id="insert_form">
+    <div class="form-group">
+      <input type="text" class="form-control" id="name" name="name" placeholder="名前（省略可）">
+    </div>
+    <div class="form-group">
+      <textarea class="form-control" id="comment" name="comment" rows="3" placeholder="コメント"></textarea>
+    </div>
+    <div class="form-group">
+      <input type="file" class="form-control-file" id="upfile" name="upfile" accept="image/*" capture="camera">
+    </div>
+    <div class="form-group">
+      <button type="button" id="send" class="btn btn-primary">Submit</button>
+    </div>
+  </form>
+
+  <script>
+    // DBから取得したデータを表示する関数
+    const createListTagFromData = data => {
+      return data.map(x =>
+        `<li class="list-group-item">
+          <p>${x.id} ${x.name} ${x.indate}</p>
+          <p>${x.comment}</p>
+          <img src="${x.image}" alt="" height="150px">
+        </li>`
+      ).join('');
+    };
+
+    // DBからデータを取得する関数
+    const getAllDataFromDb = () => {
+      const url = 'ajax_get.php';
+      fetch(url)
+        .then(res => res.json())
+        .then(response => {
+          document.getElementById('echo').innerHTML = createListTagFromData(response);
+        })
+        .catch(error => console.error('Error:', error));
+    };
+
+    // DBへデータを登録する関数
+    const insertDataToDb = () => {
+      const url = 'ajax_post.php';
+      const data = new FormData(document.getElementById('insert_form'));
+      const requestData = {
+        method: 'POST',
+        body: data
+      };
+      fetch(url, requestData)
+        .then(res => res.json())
+        .then(response => {
+          document.getElementById('echo').innerHTML = createListTagFromData(response);
+          document.getElementsByTagName('button')[0].setAttribute('disabled', false);
+        })
+        .catch(error => console.error('Error:', error));
+    };
+
+    getAllDataFromDb();
+
+    document.getElementById('showNew').addEventListener('click', function () {
+      getAllDataFromDb();
+    });
+
+    document.getElementById('send').addEventListener('click', function () {
+      document.getElementsByTagName('button')[0].setAttribute('disabled', true);
+      insertDataToDb();
+      document.getElementById('name').value = '';
+      document.getElementById('comment').value = '';
+      document.getElementById('upfile').value = '';
+    });
+
+  </script>
+
+</body>
+
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>ajax</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+        integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+    <!-- <link rel="stylesheet" href="/css/bootstrap.css"> -->
+    <link rel="stylesheet" href="css/css.css" type="text/css" />
+    <!-- <script type="text/javascript" src="/js/bootstrap.js"></script> -->
+    <style>
+        div {
+            padding: 10px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="#">うｐろだ</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a id="ajax_get" class="nav-link" href="#">一覧表示</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+    <div class="display container-fluid">
+        <div class="w-50 p-3" style="background-color: #eee;">
+            <!-- action="file_upload.php" -->
+            <form method="post" action="ajax_post.php" enctype="multipart/form-data">
+
+                <div class="form-group">
+                    <label for="date">date</label>
+                    <input type="date" class="form-control" id="date" name="date">
+                </div>
+                <div class="form-group">
+                    <label for="dwn_pw">down_pass</label>
+                    <input type="text" class="form-control" id="dwn_pw" name="dwn_pw" placeholder="Enter_pass">
+                </div>
+                <div class="form-group">
+                    <label for="del_pw">delete_pw</label>
+                    <input type="text" class="form-control" id="del_pw" name="del_pw" placeholder="Enter_pass">
+                </div>
+                <div class="form-group">
+                    <label for="comment">Comment</label>
+                    <textarea class="form-control" id="comment" name="comment" rows="1" placeholder="お借りします"></textarea>
+                </div>
+                <div class="form-group">
+                    <input type="file" id="image" name="image" accept="image/*">
+                </div>
+                <div class="form-group">
+                    <button type="submit" id="send" class="btn btn-primary">Submit</button>
+                </div>
+            </form>
+        </div>
+        <div class="w-50 p-3" style="background-color: #ddd;">
+        </div>
+    </div>
+    <ul id="echo" class="list-group">
+        <!-- データ表示部分 -->
+    </ul>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script>
+        // DBから取得したデータを表示する関数
+        function listData(data) {
+            // 書ける人は書いてみよう
+        }
+
+        // DBからデータを取得する関数
+        function selectData() {
+            const url = 'ajax_get.php';
+            $.getJSON(url)
+                .done(function (data, textStatus, jqXHR) {
+                    console.log(data);
+                })
+                .fail(function (jqXHR, textStatus, errorThrown) {
+                })
+                .always(function () {
+                });
+        }
+
+        // DBへデータを登録する関数
+        function insertData() {
+
+            const url = 'ajax_post.php';
+            const value = {
+                date: $('#date').val(), //PHP􄛷􄛿$_POST['􄜻􄞊􀾡']􄛷􀽷􀽶                
+                comment: $('#comment').val(),
+                dwn_pw: $('#dwn_pw').val(), //送信するデータを作る
+                del_pw: $('#del_pw').val(), //送信するデータを作る
+                image: $('#image')
+            };
+            console.log(url);
+            console.log(value);
+            // データ送信
+            $.ajax({
+                dataType: 'json',
+                url: url,
+                type: 'POST',
+                data: value,
+            }).done(function (data) {
+                console.log(data); //最新データの表示
+            })
+                .fail(function (XMLHttpRequest, textStatus, errorThrown) {
+                })
+                .always(function () {
+                });
+        }
+
+        // 読み込み時にDBからデータ取得
+        selectData();
+        // 送信でDBにデータ送信
+        $("#send").on("click", function () {
+            // console.log($('#image').val());
+            insertData();
+            $('#date').val(); //送信するデータを作る
+            $('#comment').val(); //PHP􄛷􄛿$_POST['􄜻􄞊􀾡']􄛷􀽷􀽶
+            $('#dwn_pw').val();
+            $('#del_pw').val();
+            $('#image');
+        });
+    </script>
+    <!-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script> -->
+</body>
+
+</html>
