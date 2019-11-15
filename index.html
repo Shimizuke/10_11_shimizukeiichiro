@@ -106,16 +106,16 @@
       // 順番にタグの形にして出力用の配列に追加する
       for (let i = 0; i < data.length; i++) {
         const str =
-          `<li class="list-group-item"  >
-            <a href="${data[i].image}">uploda${data[i].id}=${data[i].indate}<a><p>${data[i].comment}</p>
-            <a href="delete.php?id=' ${data[i].id} class="badge badge-danger">Delete</a>
+          `<li class="list-group-item">
+            <a href="${data[i].image}">uploda${data[i].id}=${data[i].indate}<a><p>comment : ${data[i].comment}</p>
+            <input class="tab" type="submit" value="Delete"><input type="text" name="del_pw">
+            <input class="tab" type="submit" value="Download"><input type="text" name="dwn_pw">
           </li>`
         array.push(str);
       }
       // 全部追加したらjoin()を使って，配列を連続した文字列にする
       return array.join('');
     };
-
     // PHPへデータを送信する関数
     function insertDataToDb() {
       const url = 'ajax_post.php';
@@ -156,7 +156,9 @@
       // データを送信する関数を実⾏
       insertDataToDb();
       // ⼊⼒欄を空にする処理
-      $('#name').val('');
+      $('#date').val('');
+      $('#dwn_pw').val('');
+      $('#del_pw').val('');
       $('#comment').val('');
       $('#upfile').val('');
     });

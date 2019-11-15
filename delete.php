@@ -9,7 +9,7 @@ $id = $_GET['id'];
 $pdo = connectToDb();
 
 //3．データ登録SQL作成
-$sql = 'DELETE FROM uploda_table2 WHERE id=:id';
+$sql = 'DELETE FROM ajax_table WHERE id=:id';
 $stmt = $pdo->prepare($sql);
 $stmt->bindValue(':id', $id, PDO::PARAM_INT);
 $status = $stmt->execute();
